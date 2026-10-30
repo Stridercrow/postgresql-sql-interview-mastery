@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: sql-interview-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: interview
+      POSTGRES_USER: interview
+      POSTGRES_PASSWORD: interview
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/00-create-schema.sql:/docker-entrypoint-initdb.d/00-create-schema.sql:ro
+      - ./database/01-seed-data.sql:/docker-entrypoint-initdb.d/01-seed-data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U interview -d interview"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres_data:
